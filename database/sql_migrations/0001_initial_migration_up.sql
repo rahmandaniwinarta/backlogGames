@@ -25,19 +25,25 @@ CREATE TABLE IF NOT EXISTS games (
 
 CREATE TABLE IF NOT EXISTS transaction (
     id INTEGER PRIMARY KEY,
-    user_id INTEGER REFERENCES user(id),
-    game_id INTEGER REFERENCES games(id),
-    quantity INTEGER,
-    total_price DECIMAL(20,2)
+    cart_id INTEGER REFERENCES cart(id),
+    status VARCHAR(255)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_by VARCHAR(255)
+)
+
+CREATE TABLE IF NOT EXISTS cart (
+    id INTEGER PRIMARY KEY,
+    user_id INTEGER REFERENCES user(id),
+    game_id INTEGER REFERENCES games(id),
+    quantitiy INTEGER,
+    total_price DECIMAL(20,2) 
 )
 
 CREATE TABLE IF NOT EXISTS genre (
     id INTEGER PRIMARY KEY,
     genre VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_by VARCHAR(255)
+    created_by VARCHAR(255),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(255)
 ) 
