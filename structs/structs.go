@@ -4,7 +4,7 @@ import "time"
 
 type User struct {
 	ID        int       `json:"id"`
-	Name      string    `json:"name"`
+	Username  string    `json:"username"`
 	Email     string    `json:"email"`
 	Password  string    `json:"password"`
 	Role      string    `json:"role"`
@@ -12,15 +12,15 @@ type User struct {
 }
 
 type Games struct {
-	ID         int       `json:"id"`
-	GenreID    int       `json:"genre_id"`
-	Title      string    `json:"title"`
-	Price      float64   `json:"price"`
-	Stock      int       `json:"stock"`
-	CreatedAt  time.Time `json:"created_at"`
-	CreatedBy  string    `json:"created_by"`
-	ModifiedAt time.Time `json:"modified_at"`
-	ModifiedBy string    `json:"modified_by"`
+	ID        int       `json:"id"`
+	GenreID   int       `json:"genre_id"`
+	Title     string    `json:"title"`
+	Price     float64   `json:"price"`
+	Stock     int       `json:"stock"`
+	CreatedAt time.Time `json:"created_at"`
+	CreatedBy string    `json:"created_by"`
+	UpdatedAt time.Time `json:"Updated_at"`
+	UpdatedBy string    `json:"Updated_by"`
 }
 
 type Transaction struct {
@@ -40,10 +40,10 @@ type Cart struct {
 }
 
 type Genre struct {
-	ID         int       `json:"id"`
-	Name       string    `json:"name"`
-	CreatedAt  time.Time `json:"created_at"`
-	CreatedBy  string    `json:"created_by"`
-	ModifiedAt time.Time `json:"modified_at"`
-	ModifiedBy string    `json:"modified_by"`
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+	CreatedBy string    `json:"created_by"`
+	UpdatedAt time.Time `json:"Updated_at"`
+	UpdatedBy string    `json:"Updated_by"`
 }

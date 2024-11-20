@@ -49,5 +49,9 @@ func main() {
 	router := gin.Default()
 
 	router.POST("/api/register/buyer", controllers.RegisterUserBuyer)
+	router.POST("/api/register/admin", controllers.RegisterUserAdmin)
+	router.POST("/api/login", controllers.LoginUser)
+	router.POST("/api/genre", controllers.InsertGenre)
+
 	router.Run(":8080")
 }
