@@ -40,12 +40,14 @@ func init() {
 
 // EncodeJWT creates a new JWT token
 func EncodeJWT(username, role string) (string, error) {
+	fmt.Println("EncodeJWT - Username:", username, "Role:", role) // Debugging
+
 	claims := Claims{
 		Username: username,
 		Role:     role,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // Token expired dalam 24 jam
-			Issuer:    "your_app",                            // Nama aplikasi Anda
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+			Issuer:    "your_app",
 		},
 	}
 

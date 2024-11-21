@@ -66,42 +66,23 @@ func InsertUserAdmin(db *sql.DB, user structs.User) (err error) {
 	return nil
 }
 
-func GetUser(db *sql.DB, user *structs.User, encryptedPass string) (err error) {
+func GetUser(db *sql.DB, user *structs.User, encryptedPass string) error {
+	query := `
+        SELECT id, username, password, role
+        FROM users
+        WHERE username = $1
+    `
 
-	fmt.Println(user)
-
-	sqls := "SELECT id, username, password from users WHERE username = $1"
-
-	errors := db.QueryRow(sqls, user.Username).Scan(&user.ID, &user.Username, &user.Password)
-
-	if errors != nil {
-		fmt.Println("Errors (13) :", errors)
-		return fmt.Errorf("errors (13): wrong password or username")
+	err := db.QueryRow(query, user.Username).Scan(&user.ID, &user.Username, &user.Password, &user.Role)
+	if err != nil {
+		return fmt.Errorf("user not found or invalid credentials")
 	}
 
+	// Verifikasi password
 	if encryptedPass != user.Password {
-		return fmt.Errorf("errors (14) : wrong password or username")
+		return fmt.Errorf("invalid username or password")
 	}
 
-	user.Password = ""
-
-	return nil
-}
-
-func KeepLogin(db *sql.DB, user string) (err error) {
-
-	var username string
-
-	fmt.Println(user)
-
-	sqls := "SELECT username from users WHERE username = $1"
-
-	errors := db.QueryRow(sqls, user).Scan(&username)
-
-	if errors != nil {
-		fmt.Println("Errors (13)", errors)
-		return fmt.Errorf("errors (13): wrong password or username")
-	}
-
+	user.Password = "" // Hapus password untuk keamanan
 	return nil
 }

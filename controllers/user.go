@@ -123,7 +123,10 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
-	// Buat token JWT
+	// Log role sebelum memanggil EncodeJWT
+	fmt.Println("LoginUser - Username:", user.Username, "Role:", user.Role)
+
+	// Generate token JWT
 	token, err := functions.EncodeJWT(user.Username, user.Role)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -133,7 +136,6 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
-	// Respons sukses dengan token JWT
 	c.JSON(http.StatusOK, gin.H{
 		"code":  http.StatusOK,
 		"token": token,

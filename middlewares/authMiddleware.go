@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"backlogGames/functions"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -31,6 +32,8 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		fmt.Println("Decoded Role:", claims.Role)
+
 		// Simpan username dan role ke context
 		c.Set("username", claims.Username)
 		c.Set("role", claims.Role)
@@ -52,6 +55,7 @@ func AdminMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		fmt.Println("Role in Context:", role)
 
 		// Lanjutkan ke handler berikutnya
 		c.Next()
