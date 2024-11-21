@@ -1,7 +1,6 @@
 package functions
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -16,7 +15,8 @@ var (
 )
 
 type Claims struct {
-	UserData string `json:"user_data"` // Store JSON string
+	Username string `json:"username"` // Username pengguna
+	Role     string `json:"role"`     // Role pengguna (admin/buyer)
 	jwt.StandardClaims
 }
 
@@ -39,16 +39,13 @@ func init() {
 }
 
 // EncodeJWT creates a new JWT token
-func EncodeJWT(userData map[string]interface{}) (string, error) {
-	userDataJSON, err := json.Marshal(userData)
-	if err != nil {
-		return "", err
-	}
+func EncodeJWT(username, role string) (string, error) {
 	claims := Claims{
-		UserData: string(userDataJSON),
+		Username: username,
+		Role:     role,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
-			Issuer:    "your_app",                            // Issuer of the token
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // Token expired dalam 24 jam
+			Issuer:    "your_app",                            // Nama aplikasi Anda
 		},
 	}
 
@@ -62,7 +59,7 @@ func EncodeJWT(userData map[string]interface{}) (string, error) {
 }
 
 // DecodeJWT parses and validates the JWT token
-func DecodeJWT(tokenString string) (map[string]interface{}, error) {
+func DecodeJWT(tokenString string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		// Ensure that the token's signing method is valid
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -74,14 +71,9 @@ func DecodeJWT(tokenString string) (map[string]interface{}, error) {
 		return nil, err
 	}
 
+	// Validate token and claims
 	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
-		// Convert JSON string back to map
-		var userData map[string]interface{}
-		err := json.Unmarshal([]byte(claims.UserData), &userData)
-		if err != nil {
-			return nil, err
-		}
-		return userData, nil
+		return claims, nil
 	}
 
 	return nil, fmt.Errorf("invalid token")

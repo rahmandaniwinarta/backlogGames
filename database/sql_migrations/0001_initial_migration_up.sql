@@ -13,12 +13,19 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS genres (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_by VARCHAR(255),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_by VARCHAR(255)
+    updated_by VARCHAR(255),
+    deleted_at TIMESTAMP
 );
+
+INSERT INTO genres (name) VALUES 
+    ('Action'),
+    ('Strategy'),
+    ('Shooter')
+ON CONFLICT (name) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS games (
     id SERIAL PRIMARY KEY,

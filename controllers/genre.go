@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"backlogGames/database"
-	"backlogGames/functions"
 	"backlogGames/repository"
 	"backlogGames/structs"
 	"fmt"
@@ -34,20 +33,9 @@ func InsertGenre(c *gin.Context) {
 
 	fmt.Println(genre)
 
-	key := c.GetHeader("Auth")
-
-	err, user := functions.AuthLogin(key)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, message{
-			Code:    http.StatusBadRequest,
-			Message: "Error occurs (??: )" + err.Error(),
-		})
-		return
-	}
-
-	genre.CreatedBy = user
-	genre.UpdatedBy = user
+	username, _ := c.Get("username")
+	genre.CreatedBy = username.(string)
+	genre.UpdatedBy = username.(string)
 
 	err = repository.InsertGenre(database.DbConnection, genre)
 	if err != nil {

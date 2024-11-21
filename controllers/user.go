@@ -94,46 +94,48 @@ func RegisterUserAdmin(c *gin.Context) {
 func LoginUser(c *gin.Context) {
 	var user structs.User
 
-	err := c.BindJSON(&user)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	EncryptedPass, err := functions.PasswordGenerator(user.Password)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, message{
-			Code:    http.StatusBadRequest,
-			Message: "Error occurs (15): " + err.Error(),
+	// Bind JSON body ke struct User
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "Invalid request body: " + err.Error(),
 		})
 		return
 	}
 
-	err = repository.GetUser(database.DbConnection, &user, EncryptedPass)
+	// Enkripsi password untuk mencocokkan dengan database
+	encryptedPass, err := functions.PasswordGenerator(user.Password)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, message{
-			Code:    http.StatusBadRequest,
-			Message: "Error occurs (16): " + err.Error(),
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": "Error encrypting password: " + err.Error(),
 		})
 		return
 	}
 
-	res, errors := functions.EncodeJWT(map[string]interface{}{
-		"data":    user,
-		"isLogin": true,
-	})
-
-	if errors != nil {
-		c.JSON(http.StatusBadRequest, message{
-			Code:    http.StatusBadRequest,
-			Message: "Error occurs (17): " + err.Error(),
+	// Validasi user di database
+	err = repository.GetUser(database.DbConnection, &user, encryptedPass)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "Invalid username or password",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
+	// Buat token JWT
+	token, err := functions.EncodeJWT(user.Username, user.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": "Error generating token: " + err.Error(),
+		})
+		return
+	}
+
+	// Respons sukses dengan token JWT
+	c.JSON(http.StatusOK, gin.H{
 		"code":  http.StatusOK,
-		"token": res,
+		"token": token,
 	})
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"backlogGames/controllers"
 	"backlogGames/database"
+	"backlogGames/middlewares"
 	"database/sql"
 	"fmt"
 	"os"
@@ -52,6 +53,11 @@ func main() {
 	router.POST("/api/register/admin", controllers.RegisterUserAdmin)
 	router.POST("/api/login", controllers.LoginUser)
 	router.POST("/api/genre", controllers.InsertGenre)
+	router.POST("/api/games", middlewares.AuthMiddleware(), middlewares.AdminMiddleware(), controllers.InsertGames)
+	router.GET("/api/games", controllers.GetAllGames)
+	router.GET("/api/games/:id", controllers.GetGameByID)
+	router.PUT("/api/games/:id", controllers.UpdateGame)
+	router.GET("/api/games/genre/:genre_id", controllers.GetGamesByGenre)
 
 	router.Run(":8080")
 }

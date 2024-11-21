@@ -16,7 +16,7 @@ func InsertUserBuyer(db *sql.DB, user structs.User) (err error) {
 
 	sqlQuery := `
 			INSERT INTO users 
-			( username, email, password, role ) 
+			( username, email, password, role )  
 			 VALUES ($1,$2,$3,$4)
 			 RETURNING id`
 
