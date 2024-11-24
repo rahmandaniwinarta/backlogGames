@@ -76,21 +76,39 @@ func GetCartItemsByCartID(db *sql.DB, cartID int) ([]structs.CartItem, error) {
 }
 
 // UpdateCartItem: Memperbarui jumlah dan total harga item dalam cart
-func UpdateCartItem(db *sql.DB, itemID, quantity int, totalPrice float64) error {
+func UpdateCartItem(db *sql.DB, itemID, quantity int) error {
 	// Validasi keberadaan item
 	if !CartItemExists(db, itemID) {
 		return fmt.Errorf("cart item with ID %d does not exist", itemID)
 	}
 
+	// Ambil game_id dari cart_items
+	var gameID int
+	query := `SELECT game_id FROM cart_items WHERE id = $1`
+	err := db.QueryRow(query, itemID).Scan(&gameID)
+	if err != nil {
+		return fmt.Errorf("failed to fetch game ID for cart item %d: %v", itemID, err)
+	}
+
+	// Ambil harga satuan dari tabel games menggunakan GetGamePrice
+	unitPrice, err := GetGamePrice(db, gameID)
+	if err != nil {
+		return fmt.Errorf("failed to fetch unit price for game %d: %v", gameID, err)
+	}
+
+	// Hitung ulang totalPrice
+	totalPrice := float64(quantity) * unitPrice
+
 	// Update item dalam cart_items
-	query := `
+	query = `
     UPDATE cart_items
     SET quantity = $2, total_price = $3
     WHERE id = $1`
-	_, err := db.Exec(query, itemID, quantity, totalPrice)
+	_, err = db.Exec(query, itemID, quantity, totalPrice)
 	if err != nil {
 		return fmt.Errorf("failed to update cart item: %v", err)
 	}
+
 	return nil
 }
 

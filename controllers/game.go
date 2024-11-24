@@ -210,5 +210,21 @@ func UpdateGame(c *gin.Context) {
 }
 
 func DeleteGames(c *gin.Context) {
+	gameID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid game ID"})
+		return
+	}
 
+	err = repository.DeleteGame(database.DbConnection, gameID)
+	if err != nil {
+		if err.Error() == "game not found" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Game not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete game"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Game deleted successfully"})
 }

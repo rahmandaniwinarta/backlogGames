@@ -95,13 +95,26 @@ func UpdateGame(db *sql.DB, games structs.Games) error {
 	return nil
 }
 
-func DeleteGame(db *sql.DB, id int) error {
-	query := `DELETE FROM games WHERE id = $1`
-
-	_, err := db.Exec(query, id)
+func DeleteGame(db *sql.DB, gameID int) error {
+	// Validasi keberadaan game
+	var exists bool
+	query := `SELECT EXISTS(SELECT 1 FROM games WHERE id = $1)`
+	err := db.QueryRow(query, gameID).Scan(&exists)
 	if err != nil {
-		return fmt.Errorf("error deleting game: %w", err)
+		return fmt.Errorf("failed to check game existence: %v", err)
 	}
+
+	if !exists {
+		return fmt.Errorf("game not found")
+	}
+
+	// Hapus game dari database
+	query = `DELETE FROM games WHERE id = $1`
+	_, err = db.Exec(query, gameID)
+	if err != nil {
+		return fmt.Errorf("failed to delete game: %v", err)
+	}
+
 	return nil
 }
 

@@ -107,7 +107,7 @@ func UpdateCartItem(c *gin.Context) {
 	}
 
 	// Panggil repository untuk memperbarui item di cart
-	err = repository.UpdateCartItem(database.DbConnection, itemID, req.Quantity, req.TotalPrice)
+	err = repository.UpdateCartItem(database.DbConnection, itemID, req.Quantity)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart item"})
 		return
